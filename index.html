@@ -6,16 +6,13 @@
 <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 <base target="_blank">
 <link rel="stylesheet" type="text/css" href="./Qgis2threejs.css">
-<style type="text/css">
-#popup, #header, #layerpanel {
-  left: 36px;
-}
-</style>
 <script src="./threejs/three.min.js"></script>
 <script src="./threejs/OrbitControls.js"></script>
 <script src="./threejs/ViewHelper.js"></script>
 <script src="./proj4js/proj4.js"></script>
 <script src="./Qgis2threejs.js"></script>
+<script src="./dat-gui/dat.gui.min.js"></script>
+<script src="./dat-gui_panel.js"></script>
 </head>
 <body>
 <div id="view">
@@ -76,9 +73,10 @@
       </table>
 
       <h1>About</h1>
-      <div id="about"><img src="./Qgis2threejs.png">
+      <div id="about">
         This page was made with <a href="https://www.qgis.org/">QGIS</a> and <a href="https://github.com/minorua/Qgis2threejs">Qgis2threejs</a> plugin (version 2.7.1).
-        <div>Powered by <a href="https://threejs.org/">three.js</a>
+        <div>Powered by <a href="https://threejs.org/">three.js</a>,
+        <a href="https://code.google.com/p/dat-gui/">dat-gui</a>
         <span id="lib_proj4js"> and <a href="https://trac.osgeo.org/proj4js/">Proj4js</a></span>.</div>
       </div>
     </div>
@@ -88,40 +86,18 @@
 <!-- progress bar -->
 <div id="progress"><div id="progressbar"></div></div>
 
-<!-- menu -->
-<div id="toolbtns">
-  <div id="layerbtn"></div>
-  <div id="animbtn" class="hidden"></div>
-  <div id="infobtn"></div>
-</div>
-
 <!-- header and footer -->
-<div id="header"><p>&nbsp;</p>
-<h1 style="text-align: center;"></h1>
-<table style="width: 100%; border-collapse: collapse; background-color: #ffffff;" border="1">
-<tbody>
-<tr>
-<td style="width: 33.3333%; text-align: center;"><strong>Mont Saint-Michel</strong></td>
-<td style="width: 33.3333%; text-align: center;"><strong>Manche</strong></td>
-<td style="width: 33.3333%; text-align: center;"><strong>Normandie</strong></td>
-</tr>
-<tr>
-<td style="width: 33.3333%;"></td>
-<td style="width: 33.3333%;"></td>
-<td style="width: 33.3333%;"></td>
-</tr>
-<tr>
-<td style="width: 33.3333%; text-align: center;">Qgis 3.30</td>
-<td style="text-align: center;">Qgis2threejs 2.7.1</td>
-<td style="width: 33.3333%; text-align: center;"><p>© RG&nbsp;&nbsp;<a href="https://twitter.com/infogere"><img src="twitter.jpg" alt="" width="20" height="21" /></a></p></td>
-</tr>
-</tbody>
-</table></div>
-<div id="footer"></div>
-
-<!-- layer panel -->
-<div id="layerpanel">
-  <div id="layerlist"></div>
+<div id="header"></div>
+<div id="footer"><table style="position: fixed; left: 100px; bottom: 10px; font-family: Arial Narrow, sans-serif; font-size: 20px; color: #000000;">
+  <tr>
+    <td style="padding: 10px;">Le Mont Saint-Michel</td>
+    <td style="padding: 10px;">Normandie</td>
+    <td style="padding: 10px;"><a href="https://www.qgis.org/fr/site/"><img src="qgis.png" alt="qgis" width="20" height="21"/>    
+    <td style="padding: 10px;"><a href="https://qgis2threejs.readthedocs.io/en/docs/index.html"><img src="Qgis2threejs.png" alt="qgis2threejs" width="20" height="21"/>
+    <td style="padding: 10px;">© RG</td>
+    <td style="padding: 10px;"><a href="https://twitter.com/infogere"><img src="twitter.png" alt="infogere sur github" width="20" height="21"/>
+  </tr>
+</table>
 </div>
 
 <!-- animation -->
@@ -133,9 +109,8 @@
 </div>
 
 <script>
-Q3D.Config.allVisible = true;
 Q3D.Config.coord.latlon = true;
-Q3D.Config.viewpoint = {lookAt:{x:-168190.4860741999,y:6213335.668620088,z:0.0},pos:{x:-167990.5871733706,y:6212744.387565758,z:249.5850427870229}};
+Q3D.Config.viewpoint = {lookAt:{x:-168246.87692635873,y:6213300.964948584,z:0.0},pos:{x:-168170.16838565937,y:6212762.871872038,z:259.88861285365385}};
 Q3D.Config.localMode = true;
 Q3D.Config.northArrow.enabled = true;
 Q3D.Config.northArrow.color = 0x6673b3;
@@ -144,15 +119,23 @@ var container = document.getElementById("view"),
     app = Q3D.application,
     gui = Q3D.gui;
 
-app.init(container);       // initialize viewer
+app.init(container);    // initialize viewer
 
 // load the scene
 app.loadSceneFile("./data/index/scene.js", function (scene) {
   // scene file has been loaded
   app.start();
+
+  gui.dat.initLayersFolder(scene);
+
 }, function (scene) {
   // all relevant files have been loaded
 
+  if (Q3D.Config.gui.customPlane) {
+    var zMin = undefined,
+        zMax = undefined;
+    gui.dat.initCustomPlaneFolder(zMin, zMax);
+  }
 });
 </script>
 </body>
